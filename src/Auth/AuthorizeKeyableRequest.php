@@ -24,7 +24,7 @@ trait AuthorizeKeyableRequest
 
             if (method_exists($policyClass, 'before')) {
                 $before = $policyClass->before($apiKey, $keyable, $object);
-                if (!is_null($before) && $before) {
+                if (! is_null($before) && $before) {
                     return new Response('');
                 }
             }

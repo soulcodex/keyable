@@ -25,34 +25,36 @@ class AuthenticateApiKey
         $token = $this->getKeyFromRequest($request);
 
         //Check for presence of key
-        if (!$token) return $this->unauthorizedResponse();
+        if (! $token) {
+            return $this->unauthorizedResponse();
+        }
 
         //Get API key
         $apiKey = ApiKey::getByKey($token);
 
         //Validate key
-        if (!($apiKey instanceof ApiKey)) return $this->unauthorizedResponse();
+        if (! ($apiKey instanceof ApiKey)) {
+            return $this->unauthorizedResponse();
+        }
 
         //Get the model
         $keyable = $apiKey->keyable;
 
         //Validate model
         if (config('keyable.allow_empty_models', false)) {
-
-            if (!$keyable && (!is_null($apiKey->keyable_type) || !is_null($apiKey->keyable_id)))
+            if (! $keyable && (! is_null($apiKey->keyable_type) || ! is_null($apiKey->keyable_id))) {
                 return $this->unauthorizedResponse();
-
+            }
         } else {
-
-            if (!$keyable)
+            if (! $keyable) {
                 return $this->unauthorizedResponse();
-
+            }
         }
 
         //Attach the apikey object to the request
         $request->attributes->add(['apiKey' => $apiKey]);
 
-        if($keyable) {
+        if ($keyable) {
             $request->attributes->add(['keyable' => $keyable]);
         }
 
@@ -75,7 +77,7 @@ class AuthenticateApiKey
         // Bearer check
         if (
             in_array('bearer', $modes) &&
-            !is_null($request->bearerToken())
+            ! is_null($request->bearerToken())
         ) {
             return $request->bearerToken();
         }
@@ -83,7 +85,7 @@ class AuthenticateApiKey
         // Header check
         if (
             in_array('header', $modes) &&
-            !is_null($request->header(config('keyable.key', 'X-Authorization')))
+            ! is_null($request->header(config('keyable.key', 'X-Authorization')))
         ) {
             return $request->header(config('keyable.key', 'X-Authorization'));
         }
@@ -91,7 +93,7 @@ class AuthenticateApiKey
         // Parameter check
         if (
             in_array('parameter', $modes) &&
-            !is_null($request->input(config('keyable.key', 'api_key')))
+            ! is_null($request->input(config('keyable.key', 'api_key')))
         ) {
             return $request->input(config('keyable.key', 'api_key'));
         }
@@ -104,8 +106,8 @@ class AuthenticateApiKey
     {
         return response([
             'error' => [
-                'message' => 'Unauthorized'
-            ]
+                'message' => 'Unauthorized',
+            ],
         ], 401);
     }
 }

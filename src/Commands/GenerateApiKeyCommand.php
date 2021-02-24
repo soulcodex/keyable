@@ -43,8 +43,8 @@ class GenerateApiKeyCommand extends Command
         $keyableType = $this->option('type');
 
         $apiKey = new ApiKey([
-            'key'          => ApiKey::generate(),
-            'keyable_id'   => $keyableId,
+            'key' => ApiKey::generate(),
+            'keyable_id' => $keyableId,
             'keyable_type' => $keyableType,
         ]);
 
