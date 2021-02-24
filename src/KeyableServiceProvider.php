@@ -16,7 +16,7 @@ class KeyableServiceProvider extends PackageServiceProvider
         $package
             ->name('keyable')
             ->hasConfigFile()
-            ->hasMigrations([__DIR__.'/../database/migrations'])
+            ->hasMigrations(__DIR__.'/../database/migrations')
             ->hasConfigFile()
             ->hasCommands([
                 GenerateApiKeyCommand::class,
