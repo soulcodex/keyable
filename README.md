@@ -2,6 +2,8 @@
 
 Keyable is a package that allows you to add API Keys to any model. This allows you to associate incoming requests with their respective models. You can also use Policies to authorize requests.
 
+[![Latest Stable Version](https://poser.pugx.org/soulcodex/model-keyable/v)](//packagist.org/packages/soulcodex/model-keyable) [![Total Downloads](https://poser.pugx.org/soulcodex/model-keyable/downloads)](//packagist.org/packages/soulcodex/model-keyable) [![Latest Unstable Version](https://poser.pugx.org/soulcodex/model-keyable/v/unstable)](//packagist.org/packages/soulcodex/model-keyable) [![License](https://poser.pugx.org/soulcodex/model-keyable/license)](//packagist.org/packages/soulcodex/model-keyable)
+
 ## Installation
 
 Require the ```soulcodex/keyable``` package in your ```composer.json``` and update your dependencies:
