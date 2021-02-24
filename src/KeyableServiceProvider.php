@@ -15,7 +15,7 @@ class KeyableServiceProvider extends PackageServiceProvider
         $this->registerMiddleware();
         $package
             ->name('soulcodex/keyable')
-            ->hasConfigFile('keyable')
+            ->hasConfigFile()
             ->hasMigrations([__DIR__.'/../database/migrations'])
             ->hasConfigFile()
             ->hasCommands([
