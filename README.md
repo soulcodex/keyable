@@ -1,79 +1,261 @@
-# :package_description
+# Laravel Keyable
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/:vendor_name/:package_name.svg?style=flat-square)](https://packagist.org/packages/:vendor_name/:package_name)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/:vendor_name/:package_name/run-tests?label=tests)](https://github.com/:vendor_name/:package_name/actions?query=workflow%3ATests+branch%3Amaster)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/:vendor_name/:package_name/Check%20&%20fix%20styling?label=code%20style)](https://github.com/:vendor_name/:package_name/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amaster)
-[![Total Downloads](https://img.shields.io/packagist/dt/:vendor_name/:package_name.svg?style=flat-square)](https://packagist.org/packages/:vendor_name/:package_name)
-
-**Note:** Run `./configure-skeleton` to get started, or manually replace  ```:author_name``` ```:author_username``` ```:author_email``` ```:vendor_name``` ```:package_name``` ```:package_description``` with their correct values in [README.md](README.md), [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](.github/CONTRIBUTING.md), [LICENSE.md](LICENSE.md) and [composer.json](composer.json) files, then delete this line. You can also run `configure-skeleton.sh` to do this automatically.
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/package-skeleton-laravel.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/package-skeleton-laravel)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+Keyable is a package that allows you to add API Keys to any model. This allows you to associate incoming requests with their respective models. You can also use Policies to authorize requests.
 
 ## Installation
 
-You can install the package via composer:
+Require the ```soulcodex/keyable``` package in your ```composer.json``` and update your dependencies:
 
 ```bash
-composer require :vendor_name/:package_name
+composer require soulcodex/keyable
 ```
 
-You can publish and run the migrations with:
-
+Publish the migration and config files:
 ```bash
-php artisan vendor:publish --provider="Spatie\Skeleton\SkeletonServiceProvider" --tag=":package_name-migrations"
+php artisan vendor:publish --provider="Soulcodex\Keyable\KeyableServiceProvider"
+```
+
+Run the migration:
+```bash
 php artisan migrate
-```
-
-You can publish the config file with:
-```bash
-php artisan vendor:publish --provider="Spatie\Skeleton\SkeletonServiceProvider" --tag=":package_name-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
 ```
 
 ## Usage
 
+Add the ```Soulcodex\Keyable\Keyable``` trait to your model(s):
+
 ```php
-$skeleton = new Spatie\Skeleton();
-echo $skeleton->echoPhrase('Hello, Spatie!');
+use Illuminate\Database\Eloquent\Model;
+use Soulcodex\Keyable\Keyable;
+
+class Account extends Model
+{
+    use Keyable;
+
+    // ...
+}
 ```
 
-## Testing
+Add the ```auth.apiKey``` middleware to the ```mapApiRoutes()``` function in your ```App\Providers\RouteServiceProvider``` file:
+
+```php
+// ...
+
+protected function mapApiRoutes()
+{
+    Route::prefix('api')
+        ->middleware(['api', 'auth.apikey'])
+	->namespace($this->namespace . '\API')
+	->group(base_path('routes/api.php'));
+}
+
+// ...
+```
+
+The middleware will authenticate API requests, ensuring they contain an API key that is valid.
+
+### Accessing keyable models in your controllers
+The model associated with the key will be attached to the incoming request as ```keyable```:
+
+```php
+use App\Http\Controllers\Controller;
+
+class FooController extends Controller {
+
+    public function index(Request $request) 
+    {
+        $model = $request->keyable;
+
+        // ...
+    }
+
+}
+```
+Now you can use the keyable model to scope your associated API resources, for example:
+```php
+return $model->foo()->get();
+```
+
+### Keys Without Models
+
+Sometimes you may not want to attach a model to an API key (if you wanted to have administrative access to your API). By default this functionality is turned off:
+
+```php
+<?php
+	
+return [
+	
+    'allow_empty_models' => true
+	
+];
+```
+
+### UUID support
+Before migrate you can config if you prefer use bigint or uuid identifiers.
+By default use `bigint` like ***keyable_id***
+
+```php
+<?php
+
+return [
+
+    'identifier' => 'bigint'
+    
+];
+```
+
+## Making Requests
+
+By default, laravel-keyable uses bearer tokens to authenticate requests. Attach the API key to the header of each request:
+
+```
+Authorization: Bearer <key>
+```
+
+You can change where the API key is retrieved from by altering the setting in the `keyable.php` config file. Supported options are: `bearer`, `header`, and `parameter`.
+
+As it is an array, you can use more than one of these options and combine them.
+
+```php
+<?php
+	
+return [
+	
+    'modes' => ['header'],
+	
+    'key' => 'X-Authorization',
+	
+];
+```
+
+Need to pass the key as a URL parameter? Set the mode to `parameter` and the key to the string you'll use in your URL:
+```php
+<?php
+	
+return [
+	
+    'modes' => ['parameter'],
+	
+    'key' => 'api_key'
+	
+];
+```
+Now you can make requests like this:
+```php
+https://example.com/api/posts?api_key=<key>
+```
+
+## Authorizing Requests
+
+Laravel offers a great way to perform [Authorization](https://laravel.com/docs/5.8/authorization) on incoming requests using Policies. However, they are limited to authenticated users. We replicate that functionality to let you authorize requests on any incoming model.
+
+To begin, add the `AuthorizeKeyableRequest` trait to your base `Controller.php class`:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+// ...
+
+use Soulcodex\Keyable\Auth\AuthorizeKeyableRequest;
+
+class Controller extends BaseController
+{
+    use AuthorizeKeyableRequest;
+}
+```
+
+Next, create the `app/Policies/KeyablePolicies` folder and create a new policy:
+
+```php
+<?php
+
+namespace App\Policies\KeyablePolicies;
+
+use App\Models\Post;
+use Illuminate\Database\Eloquent\Model;
+use Soulcodex\Keyable\Models\ApiKey;
+
+class PostPolicy {
+
+    public function view(ApiKey $apiKey, Model $keyable, Post $post) {
+    	return !is_null($keyable->posts()->find($post->id));
+    }
+    
+}
+```
+
+Lastly, register your policies in `AuthServiceProvider.php`:
+
+```php
+<?php
+
+namespace App\Providers;
+
+// ...
+
+use App\Models\Post;
+use App\Policies\KeyablePolicies\PostPolicy;
+use Soulcodex\Keyable\Facades\Keyable;
+
+class AuthServiceProvider extends ServiceProvider
+{
+	
+    // ...
+    
+    protected $keyablePolicies = [
+        Post::class => PostPolicy::class
+    ];
+
+    public function boot(GateContract $gate)
+    {
+        // ...
+        Keyable::registerKeyablePolicies($this->keyablePolicies);
+    }
+    
+}
+```
+
+In your controller, you can now authorize the request using the policy by calling `$this->authorizeKeyable(<ability>, <model>)`:
+
+```php
+<?php
+
+namespace App\Http\Controllers\PostController;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+class PostController extends Controller {
+
+    public function show(Post $post) {
+        $this->authorizeKeyable('view', $post);
+        // ...
+    }
+
+}
+```
+
+## Artisan Commands
+
+Generate an API key:
 
 ```bash
-composer test
+php artisan api-key:generate --id=1 --type="App\Models\Account"
+php artisan api-key:generate --id='6324d582-5614-430b-a35c-c24b621a93c5' --type="App\Models\Account"
 ```
 
-## Changelog
+Delete an API key:
+```bash
+php artisan api-key:delete --id=12345
+php artisan api-key:delete --id='6324d582-5614-430b-a35c-c24b621a93c5'
+```
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+## Security
 
-## Contributing
-
-Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [:author_name](https://github.com/:author_username)
-- [All Contributors](../../contributors)
+If you discover any security related issues, please email [info@soulcodex.es](mailto:info@soulcodex.es).
 
 ## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+Released under the [MIT](https://choosealicense.com/licenses/mit/) license. See [LICENSE](LICENSE.md) for more information.

@@ -1,23 +1,23 @@
 {
-    "name": ":vendor_name/:package_name",
-    "description": ":package_description",
+    "name": "soulcodex/keyable",
+    "description": "Allow attach api key to laravel models",
     "keywords": [
-        ":vendor_name",
-        ":package_name"
+        "soulcodex",
+        "keyable"
     ],
-    "homepage": "https://github.com/:vendor_name/:package_name",
+    "homepage": "https://github.com/soulcodex/keyable",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
-            "role": "Developer"
+            "name": "Roberto Garcia",
+            "email": "info@soulcodex.es",
+            "role": "Owner"
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^7.3|^7.4|^8.0",
         "spatie/laravel-package-tools": "^1.1",
-        "illuminate/contracts": "^8.0"
+        "illuminate/contracts": "^7.0|^8.0"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
@@ -27,13 +27,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\Skeleton\\": "src",
-            "Spatie\\Skeleton\\Database\\Factories\\": "database/factories"
+            "Soulcodex\\Keyable\\": "src",
+            "Soulcodex\\Keyable\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Skeleton\\Tests\\": "tests"
+            "Soulcodex\\Keyable\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -47,10 +47,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Spatie\\Skeleton\\SkeletonServiceProvider"
+                "Soulcodex\\Keyable\\KeyableServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "Spatie\\Skeleton\\SkeletonFacade"
+                "Skeleton": "Soulcodex\\Keyable\\Facades\\Keyable"
             }
         }
     },
