@@ -1,11 +1,11 @@
 {
-    "name": "soulcodex/keyable",
+    "name": "soulcodex/model-keyable",
     "description": "Allow attach api key to laravel models",
     "keywords": [
         "soulcodex",
         "keyable"
     ],
-    "homepage": "https://github.com/soulcodex/keyable",
+    "homepage": "https://github.com/soulcodex/model-keyable",
     "license": "MIT",
     "authors": [
         {
