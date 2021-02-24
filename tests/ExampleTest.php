@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Skeleton\Tests;
+namespace Soulcodex\Keyable\Tests;
 
 class ExampleTest extends TestCase
 {
