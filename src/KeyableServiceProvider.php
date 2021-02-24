@@ -20,7 +20,7 @@ class KeyableServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasCommands([
                 GenerateApiKeyCommand::class,
-                DeleteApiKeyCommand::class
+                DeleteApiKeyCommand::class,
             ]);
     }
 

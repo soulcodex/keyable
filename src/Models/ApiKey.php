@@ -30,7 +30,7 @@ class ApiKey extends Model
     {
         $identifier = config('keyable.identifier', 'bigint');
 
-        if($identifier === 'uuid') {
+        if ($identifier === 'uuid') {
             $this->keyType = 'string';
             $this->incrementing = false;
         }

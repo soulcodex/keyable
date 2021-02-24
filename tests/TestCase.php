@@ -13,7 +13,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            function(string $modelName){
+            function (string $modelName) {
                 return 'Soulcodex\\Keyable\\Database\\Factories\\'.class_basename($modelName).'Factory';
             }
         );

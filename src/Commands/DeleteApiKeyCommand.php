@@ -43,6 +43,7 @@ class DeleteApiKeyCommand extends Command
         $key = ApiKey::query()->firstOrFail($this->option('id'));
         $key->delete();
         $this->info('API key successfully deleted.');
+
         return;
     }
 }
