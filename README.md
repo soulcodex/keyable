@@ -9,7 +9,7 @@ Keyable is a package that allows you to add API Keys to any model. This allows y
 Require the ```soulcodex/keyable``` package in your ```composer.json``` and update your dependencies:
 
 ```bash
-composer require soulcodex/keyable
+composer require soulcodex/model-keyable
 ```
 
 Publish the migration and config files:
